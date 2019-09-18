@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <meta name="description" content="">
+      <meta name="author" content="">
+      <title>Py chat</title>
+      <!-- Icon attribution : https://www.flaticon.com/free-icon/avatar_147142 -->
+      <!-- Bootstrap core CSS -->
+      <!-- <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"> -->
+      <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+      <!-- Custom styles for this template -->
+      <script src= "assets/vendor/jquery/jquery.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.js"></script>
+      <script>
+         var global = {};
+      </script>
+      
+      <script id="crc_template" type="text/template">
+         <div class="custom-control custom-radio">
+         	<input type="radio" class="custom-control-input" id="{% verbatim %}{{ radioButId }}{% endverbatim %}" name="groupOfDefaultRadios" value="{% verbatim %}{{ chatRoomName }}{% endverbatim %}">
+         	<label id="{% verbatim %}{{ radioButId }}{% endverbatim %}" class="custom-control-label" for="{% verbatim %}{{ radioButId }}{% endverbatim %}">{% verbatim %}{{ chatRoomName }}{% endverbatim %}
+         	</label>
+         	<p>{% verbatim %}{{ chatRoomDescr }}{% endverbatim %}</p>
+         </div>
+          
+      </script>
+      
+      <script id="chatwindow_send_msg_template" type="text/template">		   
+         <li class="message left appeared">
+         <div class="avatar"><img alt="" src="{% verbatim %}{{ userAvatar }}{% endverbatim %}" /></div>
+         <div class="text_wrapper">
+           <div class="text">{% verbatim %}{{ message }}{% endverbatim %}</div>
+         </div>
+         </li>			
+      </script>
+      <script id="chatwindow_receive_msg_template" type="text/template">		   
+         <li class="message right appeared">
+         <div class="avatar"><img alt="" src="{% verbatim %}{{ userAvatar }}{% endverbatim %}" /></div>
+         <div class="text_wrapper">
+           <div class="text">{% verbatim %}{{ message }}{% endverbatim %}</div>
+         </div>
+         </li>			
+      </script>
+      
+      
+   </head>
+   <body>
+      <!-- Navigation -->
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+         <div class="container">
+            <a class="navbar-brand" href="#">HRMS</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+               <ul class="navbar-nav ml-auto">
+                  <li class="nav-item active">
+                     <a class="nav-link" href="#">Home
+                     <span class="sr-only">(current)</span>
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link" href="#">About</a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link" href="#">Services</a>
+                  </li>
+                  <li class="nav-item">
+                     <!-- <a class="nav-link" href="/pychat/logout/dumboo/">Logout</a> -->
+                     <!-- Drop down profile image with logout submenu. Reference : https://bootsnipp.com/snippets/Oqrd -->
+                  <li class="dropdown">
+                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                     <span><img src="assets/images/user.jpg"></img></span> 
+                     <strong>{{ userName }}</strong>
+                     </a>
+                     <ul class="dropdown-menu">
+                        <li>
+                           <div class="navbar-login">
+                              <div class="row">
+                                 <!-- <div class="col-lg-4">
+                                    <p class="text-center">
+                                        <span class="glyphicon glyphicon-user icon-size"></span>
+                                    </p>
+                                    </div> -->
+                                 <div class="col-lg-12">
+                                    <p>
+                                       <a href="/pychat/logout/dumboo/" style="border-radius: .25rem;text-align: center;text-decoration: none" class="btn-primary btn-block">Logout</a>
+                                       </p
+                                 </div>
+                              </div>
+                           </div>
+                        </li>
+                     </ul>
+                  </li>
+                  <!-- End drop down profile --> 
+                  </li>
+               </ul>
+            </div>
+         </div>
+      </nav>
+      <!-- Page Content -->
+      <div class="container">
+         <div class="row" id="div1">
+            <div class="col-lg-3">
+               <h1 class="my-4">Lets talk!</h1>
+               <!-- Note : Django templating language is not same as python syntax -->
+               <!-- {% ifnotequal request.session.user "none" %}
+               {% if request.session.user == 'admin' %} -->
+               <div class="list-group">
+                  <a href="#" class="list-group-item">Add User</a>
+                  <a href="#" class="list-group-item">Delete Uer</a>
+                  <a href="#" class="list-group-item">Configure chatroom</a>
+               </div>
+               <!-- {% else %} -->
+               <div class="list-group" id="joinchat">
+                  <a href="" class="list-group-item">Join chatroom</a>
+               </div>
+               <!-- {% endif %}
+               {% endifnotequal %} -->
+            </div>
+            <!-- /.col-lg-3 -->
+            <div></div>
+            <!-- {% if request.session.user == 'none' %}	-->	
+            <div class="col-lg-9">
+               <div class="row">
+                  <!-- Login form. Taken from https://startbootstrap.com/snippets/login/ -->
+                  <div class="container">
+                     <div class="row">
+                        <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+                           <div class="card card-signin my-5">
+                              <div class="card-body">
+                                 <h5 class="card-title text-center">Sign In</h5>
+                                 <form class="form-signin" action="/pychat/login/" method="post">
+                                    <!-- {% csrf_token %} -->
+                                    <div class="form-label-group">
+                                       <input type="email" id="inputEmail" name="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+                                       <label for="inputEmail">Email address</label>
+                                    </div>
+                                    <div class="form-label-group">
+                                       <input type="password" id="inputPassword" name="inputPassword" class="form-control" placeholder="Password" required>
+                                       <label for="inputPassword">Password</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox mb-3">
+                                       <input type="checkbox" class="custom-control-input" id="customCheck1">
+                                       <label class="custom-control-label" customCheck1">Remember password</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox mb-3">
+                                       <input type="checkbox" class="custom-control-input" id="isAdminCheck" name="isAdminCheck">
+                                       <label class="custom-control-label"  for="isAdminCheck">Is admin ?</label>
+                                    </div>
+                                    <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Sign in</button>
+                                    <hr class="my-4">
+                                 </form>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <!-- /.row -->
+            </div>
+            <!-- {% else %}	-->
+            <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+               <!-- <div class="col-lg-6 col-md-6 mb-6"> -->
+               <!-- class card h-100 is applying border:1px solid. I need to disable this border -->
+               <div class="card h-100" style="border:none;background-color" id="cardDiv">
+                  <div id="main-body" class="card-body">
+                     <div id="welcomediv" >
+                        <h4 class="card-title">
+                           <!-- Refer to default Django server side templating -->
+                           <!-- https://tutorial.djangogirls.org/en/django_templates/ -->
+                           <a href="#">Welcome {{ request.session.user }}</a>
+                        </h4>
+                     </div>
+                     <div id="chatroomconfig" style="display: none;">
+                        <div class="row">
+                           <div id="chatroomconfig1" class="col-lg-8">
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <div class="chat_window" id="id_chat_window" style="display: none;">
+                  <div class="top_menu">
+                     <div class="buttons">
+                        <div class="button"><img id="chatWindowCancel" src="assets/images/cancel.jpg"/></div>
+                        <!-- <div class="button minimize"></div>
+                           <div class="button maximize"></div> -->
+                     </div>
+                     <div class="title">Chat</div>
+                  </div>
+                  <ul class="messages"></ul>
+                  <div class="bottom_wrapper clearfix">
+                     <div class="message_input_wrapper"><input id="msg_text_box"  class="message_input"/></div>
+                     <div class="send_message">
+                        <div class="icon"></div>
+                        <div class="text">Send</div>
+                     </div>
+                  </div>
+               </div>
+               <div class="message_template" style="display: none;">
+                  <li class="message">
+                     <div class="avatar"></div>
+                     <div class="text_wrapper">
+                        <div class="text"></div>
+                     </div>
+                  </li>
+               </div>
+               <!-- {% endif %} -->
+               <!-- /.col-lg-9 -->
+            </div>
+            <!-- /.row -->
+         </div>
+         <!-- /.container -->
+      </div>
+      <!-- Bootstrap core JavaScript -->
+      <!-- <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script> -->
+      <!-- Footer -->
+      <footer class="py-5 bg-dark footerfixedbottom">
+         <div class="container">
+            <p class="m-0 text-center text-white">Copyright &copy; https://binitabharati.wordpress.com/ 2019</p>
+         </div>
+      </footer>
+   </body>
+</html>

@@ -1,0 +1,52 @@
+/*!
+ * Start Bootstrap - Shop Homepage (https://startbootstrap.com/template-overviews/shop-homepage)
+ * Copyright 2013-2019 Start Bootstrap
+ * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-shop-homepage/blob/master/LICENSE)
+ */
+body {
+  padding-top: 56px;
+}
+
+/** The below is for the same day delivery marquee text - start*/
+.scroll-right {
+ height: 40px;	
+ position: relative;
+}
+.scroll-right p {
+ color: limegreen;
+ width: 100%;
+ height: 100%;
+ margin: 0;
+ text-align: center;
+ /* Starting position */
+ -moz-transform:translateX(150%);
+ -webkit-transform:translateX(150%);	
+ transform:translateX(150%);
+ /* Apply animation to this element */	
+ -moz-animation: example1 15s linear infinite;
+ -webkit-animation: example1 15s linear infinite;
+ animation: example1 15s linear infinite;
+}
+/* Move it (define the animation) */
+@-moz-keyframes example1 {
+ 0%   { -moz-transform: translateX(150%); }
+ 100% { -moz-transform: translateX(-150%); }
+}
+@-webkit-keyframes example1 {
+ 0%   { -webkit-transform: translateX(150%); }
+ 100% { -webkit-transform: translateX(-150%); }
+}
+@keyframes example1 {
+ 0%   { 
+ -moz-transform: translateX(150%); /* Firefox bug fix */
+ -webkit-transform: translateX(150%); /* Firefox bug fix */
+ transform: translateX(150%); 		
+ }
+ 100% { 
+ -moz-transform: translateX(-150%); /* Firefox bug fix */
+ -webkit-transform: translateX(-150%); /* Firefox bug fix */
+ transform: translateX(-150%); 
+ }
+}
+
+/** Same day delivery marquee text - end*/
