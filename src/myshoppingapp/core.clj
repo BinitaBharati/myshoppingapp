@@ -19,6 +19,8 @@
             [muuntaja.core :as m]
             [clojure.java.io :as io] 
             [ring.middleware.session :as session]
+            [ring.middleware.cookies :as cookies]
+            [ring.middleware.json :as json]
             [clostache.parser :as cp]
             ))
 ;https://github.com/ring-clojure/ring/wiki/Sessions
@@ -65,27 +67,16 @@
         categoryListHtml (reduce str (map constructCategoryListHtml categoryList))
         
         ]
+    (println "USER from session =  !! "user)
     (println "categoryList !! "categoryList)
-    (println "categoryListHtml final "(type categoryListHtml))
-
+    (println "categoryListHtml finallllll "(type categoryListHtml))
+    {  :status 200
+         :headers {"Content-Type" "text/html"}
+         :body  (cp/render-resource "public/home3.mustache" {:categoriesHtml categoryListHtml})
+     }
     
-    (cond 
-      (nil? user)
-      {  :status 200
-         :headers {"Content-Type" "text/html"}
-         :body  (cp/render-resource "public/home3.mustache" {:login false :greetuser false :categoriesHtml 
-          categoryListHtml})
-         :session (assoc session :user user)
-      }
-      :else
-      
-      {  :status 200
-         :headers {"Content-Type" "text/html"}
-         :body  (cp/render-resource "public/home3.mustache" {:login true :greetuser true :user user :categoriesHtml 
-          categoryListHtml})
-         :session (assoc session :user user)
-      }
-      )))
+   
+    ))
 
 
 (defn test [request]
@@ -122,16 +113,78 @@
          (do 
             (let [categoryList (dbutil/listProductCategories nil)
                  categoryListHtml (reduce str (map constructCategoryListHtml categoryList))
-                 user (get loginResult :name)
-                 type (get loginResult :type)
-                 session (get request :session)]
+                 userName (get loginResult :name)
+                 userEmail (get loginResult :email)
+                 userType (get loginResult :type)
+                 session (get request :session)
+                 cookieVal (str "email=" userEmail ";name=" userName ";type=" userType)]
+               (println "cookieVal = "cookieVal)
                {:status 200
                :headers {"Content-Type" "text/html"}
-               :body  (cp/render-resource "public/home3.mustache" {:login true :greetuser true :user user :categoriesHtml 
+               :body  (cp/render-resource "public/home3.mustache" {:login true :greetuser true :user userName :categoriesHtml 
                categoryListHtml})
-               :session (assoc session :user user)
+               :session (assoc session :user userName)
+               ;Set cookies for UI. Above session key is for server.
+               ;:cookies {"userCreds" {:value (str (:email loginResult) ";" (:first_name loginResult) ";" (:last_name loginResult)) :path "/"  } }
+               :cookies {"userCreds" {:value  cookieVal :path "/"  } }
                }
              )))))
+
+(defn loginsubmit2 [request]
+  (let [params (get request :params)
+       inputEmail (get params "inputEmail")
+       inputPassword (get params "inputPassword")
+       loginResult   (dbutil/login {:inputEmail inputEmail :inputPassword inputPassword})
+       ]
+       (println "params is "params "inputEmail is "inputEmail "inputPassword is "inputPassword)
+       (println "loginResult is "loginResult)
+       (cond 
+         (nil? loginResult)
+         {:status 200
+         :headers {"Content-Type" "application/json"}
+         :body {:msg "LogIn failed. Incorrect credentials"}       
+         }
+         :else
+         (do (let [userName (get loginResult :name)
+                  userEmail (get loginResult :email)
+                  userType (get loginResult :type)
+                  session (get request :session)]
+                 {:status 200
+                 :headers {"Content-Type" "application/json"}
+                 :body {:status "success" :msg "Logged In, yayyyy"}     
+                 :session (assoc session :user userName)
+                 ;Set cookies for UI. Above session key is for server.               
+                 :cookies {"userCreds" {:value (str "email=" userEmail ";name=" userName ";type=" userType) :path "/"  } }
+                 })))))
+
+(defn loginsubmit3 [request]
+  (let [params (get request :body)
+       inputEmail (get params "inputEmail")
+       inputPassword (get params "inputPassword")
+       loginResult   (dbutil/login {:inputEmail inputEmail :inputPassword inputPassword})
+       ]
+       (println "params is "params "inputEmail is "inputEmail "inputPassword is "inputPassword)
+       (println "loginResult is "loginResult)
+       (cond 
+         (nil? loginResult)
+         {:status 200
+         :headers {"Content-Type" "application/json"}
+         :body {:status "ERROR" :msg "LogIn failed. Incorrect credentials."}       
+         }
+         :else
+         (do (let [userName (get loginResult :name)
+                  userEmail (get loginResult :email)
+                  userType (get loginResult :type)
+                  session (get request :session)
+                  cookieVal (str "email=" userEmail ";name=" userName ";type=" userType)]
+                 (println "cookie val = "cookieVal)
+                 {:status 200
+                 :headers {"Content-Type" "application/json"}
+                 :body {:status "SUCCESS" :msg "Logged In successfully." :userName userName :userType userType}     
+                 :session (assoc session :user userName)
+                 ;Set cookies for UI. Above session key is only for server.               
+                 :cookies {"userCreds" {:value cookieVal :path "/"  } }
+                 })))))
 
 
 (def app
@@ -144,12 +197,28 @@
                  :get login}]
 ["/loginsubmit" {:name ::loginsubmit
                  :post loginsubmit}]
+;loginsubmit2 is with request content-type : application/x-www-form-urlencoded  
+["/loginsubmit2" {:name ::loginsubmit2
+                 :post loginsubmit2}]
+;loginsubmit3 is with request content-type : application/json  
+["/loginsubmit3" {:name ::loginsubmit3
+                 :post loginsubmit3}]
 ["/test" {:name ::test
                  :get test}]
        ;Ref - https://metosin.github.io/reitit/ring/static.html
 ["/assets/*" (ring/create-resource-handler)]])
       (ring/create-default-handler)
-{:middleware [session/wrap-session parameters/parameters-middleware]}))
+{:middleware [
+              ;Ref - Ring session handler
+              session/wrap-session 
+              ;Ref - Request Parameter handling in reitit - https://metosin.github.io/reitit/ring/default_middleware.html
+              ;Looks like in Reitit, default request parameter handling type is application/x-www-form-urlencoded            
+              parameters/parameters-middleware 
+              ;If you want to handle application/json request params, you could use https://github.com/ring-clojure/ring-json's wrap-json-body/wrap-json-params
+              json/wrap-json-body
+              ;Ref - JSON response middleware for ring - https://github.com/ring-clojure/ring-json
+              json/wrap-json-response
+              cookies/wrap-cookies]}))
 
 (defn -main
   "This is invoked at the start of the REPL. This will do all pre-processing required
