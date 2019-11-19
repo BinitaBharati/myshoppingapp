@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import Cookies from 'js-cookie';
+import axios from 'axios';
+import ProductSearchResultsModalDialog from "./ProductSearchResultsModalDialog.jsx";
 
 
 /* 
@@ -30,11 +32,40 @@ class NavigationBar extends Component {
 	  userName: userName,
 	  userType: userType
     };
+	
+	this.handleSearchButtonClick = this.handleSearchButtonClick.bind(this);
   }
   
   
+  
+  handleSearchButtonClick(event) {
+	      alert("handleSearchButtonClick: entered with "+this.searchString.value);
+	  	  /* By default axios serializes JavaScript objects to JSON (ie content-type: application/json)
+		   */
+          axios({
+				method: 'get',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				url: '/search/product?keyword='+this.searchString.value
+			})
+			.then(response => {
+				alert("handleSearchButtonClick: response is  = "+JSON.stringify(response));
+				//Transform the ranking to star notation.
+				var rankMap =  {"5" : "&#9733; &#9733; &#9733; &#9733; &#9733;" , "4" : "&#9733; &#9733; &#9733; &#9733; &#9734;" , 
+	                           "3" : "&#9733; &#9733; &#9733; &#9734; &#9734;" , "2" : "&#9733; &#9733; &#9734; &#9734; &#9734;", "1" : "&#9733; &#9734; &#9734; &#9734; &#9734;"};
+				//Need to show results in ProductSearchResultsModalDialog
+				ReactDOM.render(<ProductSearchResultsModalDialog searchResultJson={response}/>, document.getElementById("productSearchResultsDisplayModalRoot"));
+				//window.productSearchResultsModalRef.setSearchResultAjaxResponse(response);
+                				
+			})
+			.catch(function (error) {
+				alert(error.message);
+		    });
+  }
+  
   render() {
-	  alert('NavigationBar: render : state is '+JSON.stringify(this.state.userEmail));
+	  //alert('NavigationBar: render : state is '+JSON.stringify(this.state.userEmail));
 	  if (this.state.userEmail !== 'NA') //not empty string means user is logged in.
 	  {
 		  return (
@@ -47,9 +78,14 @@ class NavigationBar extends Component {
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
-		<form class="form-inline">
-			<input class="form-control" type="text" placeholder="Search" aria-label="Search"/>
-		</form>		
+		<div class="input-group" style={{ width: "400px" }}>
+			<input id="autosuggest" class="typeahead  form-control" type="text" placeholder="Search" size="40" ref={(asInput) => this.searchString = asInput}/>
+			<div class="input-group-append">
+				<button id="searchSuggestion" class="btn btn-secondary" type="button" style={{ backgroundColor: "#e9ecef"}} onClick={this.handleSearchButtonClick}>
+					<i class="fa fa-search text-grey"></i>
+				</button>
+			</div>
+		</div>
         <ul class="navbar-nav ml-auto">
           <li class="nav-item active" style={{ marginTop: "22px" }}>
             <a class="nav-link" href="#">Home
@@ -87,9 +123,14 @@ class NavigationBar extends Component {
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
-		<form class="form-inline">
-			<input class="form-control" type="text" placeholder="Search" aria-label="Search"/>
-		</form>
+		 <div class="input-group" style={{ width: "400px" }}>
+			<input id="autosuggest" class="typeahead  form-control" type="text" placeholder="Search" size="40" ref={(asInput) => this.searchString = asInput}/>
+			<div class="input-group-append"> 
+				<button id="searchSuggestion" class="btn btn-secondary" type="button" style={{ backgroundColor: "#e9ecef"}} onClick={this.handleSearchButtonClick}>
+					<i class="fa fa-search text-grey"></i>
+				</button>
+			</div>
+		</div>
         <ul class="navbar-nav ml-auto">
           <li class="nav-item active" style={{ marginTop: "22px" }}>
             <a class="nav-link" href="#">Home

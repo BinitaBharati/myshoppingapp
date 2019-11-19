@@ -14,12 +14,18 @@
 
   <!-- Bootstrap core CSS -->
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-  <!-- <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"> -->
-
+  <!-- Bootstrap does not have its own icon library, but works fine with other 3rd party libs like FontAwesome.
+  To use FontAwesome icon library, we need to get a code (16a76b9dfc in our case) by registering @ https://fontawesome.com/
+  Once you register with your emai id, you will receive a code. That code has to be used in the script tag as given below.
+  The Search bar icon in this project comes from there.  -->
+  <script src="https://kit.fontawesome.com/16a76b9dfc.js" crossorigin="anonymous"></script>
   <!-- Custom styles for this template -->
   <link href="assets/css/shop-homepage.css" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script> 
+  <!-- Bootstrap uses Twitter typeahead library to provide search suggestions. React also has its own 
+  @ https://www.npmjs.com/package/react-autosuggest . But, I have not used it in this project. -->
+  <script type="text/javascript" src="assets/vendor/twitter/typeahead.js"></script>
 
 </head>
 
@@ -27,10 +33,13 @@
 <!-- Common Navigation Bar across all pages. I decided to render the navigation bar html through JSX bcoz of the following use case(s):
 1) Its a common navigation bar across all pages.
 2) On click of shopping cart icon in the nav bar, the shopping cart content should be displayed in a pop-up on the same page.
-3)On click of Login - Ref : https://getbootstrap.com/docs/4.0/components/modal/
+3) On click of Login - Ref : https://getbootstrap.com/docs/4.0/components/modal/
 -->
  <div id="navBarRoot"></div>
+ <!-- Show React component LogInModalDialog on click of LogIn button inside NavigationBar -->
  <div id="loginModalRoot"></div>
+ <!-- Show React component representing results of product search on click of search button in auto suggest box of NavigationBar -->
+ <div id="productSearchResultsDisplayModalRoot"></div>
 
   <!-- Page Content -->
   <div class="container">
@@ -174,9 +183,13 @@
   </footer>
 <script type="text/javascript">
 var GLOBAL_REACT_COMPONENT_REFS = {};
-</script>  
+</script> 
+
 <script type="text/javascript" src="assets/js/navbar.js"></script>
 <script type="text/javascript" src="assets/js/loginModal.js"></script>
+<script type="text/javascript" src="assets/js/autosuggest.js"></script> 
+<!-- <script type="text/javascript" src="assets/js/productSearchResultsModal.js"></script> -->
+
 
 
 </body>

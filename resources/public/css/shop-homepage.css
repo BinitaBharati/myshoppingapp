@@ -50,3 +50,25 @@ body {
 }
 
 /** Same day delivery marquee text - end*/
+
+/* Twitter typeahead styling for autosuggest search bar - start
+   tt-menu is the result menu div that should show up after ajax results are received
+   background-color is given because the there is no default background color for the menu div
+   and all menu items become invisible as they are lying on top of black navigation bar.
+   width is given to match autosuggest input size.   */
+.tt-menu {
+	background-color: white; 
+	width: 420px;
+	border: 2px solid #e9ecef;
+	border-radius: 5px
+}
+
+
+
+.tt-suggestion:hover, .tt-selectable:hover {
+	background: #007bff;
+}
+/* Twitter typeahead styling for autosuggest search bar - end */
+
+
+

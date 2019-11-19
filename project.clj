@@ -14,11 +14,15 @@
                  [metosin/reitit "0.3.9"]
                  ;[javax.servlet/javax.servlet-api "4.0.1"]
                  [de.ubercode.clostache/clostache "1.4.0"]
+                 [ring/ring-json "0.5.0"]
+                 [org.apache.lucene/lucene-core "8.2.0"]
+                 [org.apache.lucene/lucene-queryparser "8.2.0"]
                  ]
   :main ^:skip-aot myshoppingapp.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}
   :repl-options {:host "192.168.10.12" :port 42676 :init-ns myshoppingapp.core }
   :jvm-opts ["-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5010"]
+  :java-source-paths ["java"]
   
   )

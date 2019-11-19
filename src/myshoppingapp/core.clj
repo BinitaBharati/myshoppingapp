@@ -21,8 +21,11 @@
             [ring.middleware.session :as session]
             [ring.middleware.cookies :as cookies]
             [ring.middleware.json :as json]
+            [ring.middleware.params :as rmp]
             [clostache.parser :as cp]
-            ))
+            [clojure.string :as cljstr]
+            )
+  (:import bharati.binita.myshoppingapp.util.LuceneUtil))
 ;https://github.com/ring-clojure/ring/wiki/Sessions
 ;https://github.com/metosin/reitit/issues/205
 (defn home [request]
@@ -141,7 +144,8 @@
        (cond 
          (nil? loginResult)
          {:status 200
-         :headers {"Content-Type" "application/json"}
+         :headers {"Content-Type" "
+"}
          :body {:msg "LogIn failed. Incorrect credentials"}       
          }
          :else
@@ -186,6 +190,50 @@
                  :cookies {"userCreds" {:value cookieVal :path "/"  } }
                  })))))
 
+(defn autosuggest [request]
+  (println "autosuggest: entered with "request)
+  (let [searchString (get-in request [:params "keyword"])
+       searchResult   (dbutil/autosuggest searchString)
+       ]
+    (println "searchString is "searchString)
+    (println "searchResult is "searchResult)       
+    {:status 200
+     :headers {"Content-Type" "application/json"}
+     :body {:status "SUCCESS" :searchResult searchResult}     
+                 
+     }))
+
+;Make permutations across words of the given search pharse
+;"gold bangles" will have 2 permutations - "gold bangles" and "bangles gold"
+;It wil be more trciky if more than 2 words are involved in the searchPhrase.
+;For simplicity, we are assuming only two words are present in searchPhrase.
+(defn makePermutations [searchField searchValue]
+  (let [searchValueSplitVec (cljstr/split searchValue #" ")
+        searchValueFwdStr (cljstr/join " " searchValueSplitVec)
+        searchValueBackwdStr (cljstr/join " " (reverse searchValueSplitVec))]
+    (str searchField ":" "\"" searchValueFwdStr "\" OR " searchField ":" "\"" searchValueBackwdStr "\"")))
+
+(defn extractProductInfo [eachSearchResultLuceneDoc]
+  {"productId" (. eachSearchResultLuceneDoc get "productId") "rank"  (. eachSearchResultLuceneDoc get "actualRank") "name" (. eachSearchResultLuceneDoc get "name")
+   "price" (. eachSearchResultLuceneDoc get "price") "pictures" (. eachSearchResultLuceneDoc get "pictures")})
+
+(defn searchProduct [request]
+  (println "searchProduct: entered with "request)
+  (let [searchString (get-in request [:params "keyword"])
+        searchLucenePhrase (makePermutations "searchTag" searchString)
+        searchResult   (LuceneUtil/search searchLucenePhrase "/home/vagrant/shared1/myshoppingapp/lucene/index")
+        extractedSearchResult (map extractProductInfo searchResult)
+       ]
+    (println "searchString is "searchString)
+    (println "searchLucenePhrase is "searchLucenePhrase)
+    (println "searchResult is "searchResult) 
+    (println "extractedSearchResult is "extractedSearchResult) 
+    {:status 200
+     :headers {"Content-Type" "application/json"}
+     :body {:status "SUCCESS" :searchResult extractedSearchResult}     
+                 
+     }))
+
 
 (def app
   (ring/ring-handler
@@ -203,8 +251,12 @@
 ;loginsubmit3 is with request content-type : application/json  
 ["/loginsubmit3" {:name ::loginsubmit3
                  :post loginsubmit3}]
+["/autosuggest" {:name ::autosuggest
+                 :get autosuggest}]
 ["/test" {:name ::test
                  :get test}]
+["/search/product" {:name ::searchProduct
+                   :get searchProduct}]
        ;Ref - https://metosin.github.io/reitit/ring/static.html
 ["/assets/*" (ring/create-resource-handler)]])
       (ring/create-default-handler)
@@ -218,13 +270,15 @@
               json/wrap-json-body
               ;Ref - JSON response middleware for ring - https://github.com/ring-clojure/ring-json
               json/wrap-json-response
+              ;Ref - Extract GET query params - https://github.com/ring-clojure/ring/wiki/Parameters
+              rmp/wrap-params
               cookies/wrap-cookies]}))
 
 (defn -main
   "This is invoked at the start of the REPL. This will do all pre-processing required
   for this app, like creating DB tables etc."
   [& args]
-  (println "Initializing application...")
+  (println "Initializing application.... Entered with args = "args)
   (dbutil/init-db-main nil)
   (jetty/run-jetty #'app {:host "192.168.10.12" :port 3000})
   )

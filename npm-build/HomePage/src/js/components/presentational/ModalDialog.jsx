@@ -33,7 +33,7 @@ ModalDialog.propTypes = {
   ariaLabel: PropTypes.string.isRequired,
   modalBody: PropTypes.func.isRequired,
   errorMsgJsx: PropTypes.func,//optional
-  actionButtonLabel: PropTypes.string.isRequired,
-  actionBtnOnClickHandler: PropTypes.func.isRequired
+  actionButtonLabel: PropTypes.string.isRequired,//optional
+  actionBtnOnClickHandler: PropTypes.func.isRequired//optional 
 };
 export default ModalDialog;
