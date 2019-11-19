@@ -12,6 +12,9 @@ Leiningen[[Leiningen](https://leiningen.org/ "Leiningen Homepage")] has been use
 ## Installation
 cd to the project directory and run `lein run`. This will compile and start the server process at port 3000.
 
+## Screen shots
+Please take a look at the projects overview page available @ [Project overview](https://binitabharati.wordpress.com/2019/11/19/e-commerce-web-site-with-clojure-reactjs-bootstrap-lucene/ "Wordpress project homepage")
+
 ## License
 
 Copyright © 2019 Binita Bharati
