@@ -1,6 +1,6 @@
 # myshoppingapp
 
-A e-commerce web site developed using Clojure[[Clojure](https://clojure.org/ "Clojure Homepage")]/ReactJs[[ReactJs](https://reactjs.org/ "React Homepage")]/Bootstrap[[Bootstrap4](https://getbootstrap.com/docs/4.0/getting-started/introduction/ "Bootstrap4 Homepage")]/Lucene[[Lucene](https://lucene.apache.org/ "Lucene Homepage")].
+An e-commerce web site developed using Clojure[[Clojure](https://clojure.org/ "Clojure Homepage")]/ReactJs[[ReactJs](https://reactjs.org/ "React Homepage")]/Bootstrap[[Bootstrap4](https://getbootstrap.com/docs/4.0/getting-started/introduction/ "Bootstrap4 Homepage")]/Lucene[[Lucene](https://lucene.apache.org/ "Lucene Homepage")].
 
 ## Build
 ### React JSX build
