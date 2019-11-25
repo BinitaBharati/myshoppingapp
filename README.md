@@ -1,44 +1,23 @@
 # myshoppingapp
 
-FIXME: description
+An e-commerce web site developed using Clojure[[Clojure](https://clojure.org/ "Clojure Homepage")]/ReactJs[[ReactJs](https://reactjs.org/ "React Homepage")]/Bootstrap[[Bootstrap4](https://getbootstrap.com/docs/4.0/getting-started/introduction/ "Bootstrap4 Homepage")]/Lucene[[Lucene](https://lucene.apache.org/ "Lucene Homepage")].
+
+## Build
+### React JSX build
+npm should be used to build the React JSX (extension `.jsx`) files. Once the `npm run build` generates the desired `.js` files, those need to be copied into the project's `resources/public/js` folder.The raw JSX files have been placed under `npm-build` directory of this project.
+
+### Clojure backend build
+Leiningen[[Leiningen](https://leiningen.org/ "Leiningen Homepage")] has been used. Nothing specific needs to be done to build the backend.As part of installation of this project, the backend build will also happen.
 
 ## Installation
+cd to the project directory and run `lein run`. This will compile and start the server process at port 3000.
 
-Download from http://example.com/FIXME.
-
-## Usage
-
-FIXME: explanation
-
-    $ java -jar myshoppingapp-0.1.0-standalone.jar [args]
-
-## Options
-
-FIXME: listing of options this app accepts.
-
-## Examples
-
-...
-
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
+## Screen shots
+Please take a look at the projects overview page available @ [Project overview](https://binitabharati.wordpress.com/2019/11/19/e-commerce-web-site-with-clojure-reactjs-bootstrap-lucene/ "Wordpress project homepage")
 
 ## License
 
-Copyright © 2019 FIXME
+Copyright © 2019 Binita Bharati
 
-This program and the accompanying materials are made available under the
-terms of the Eclipse Public License 2.0 which is available at
-http://www.eclipse.org/legal/epl-2.0.
-
-This Source Code may also be made available under the following Secondary
-Licenses when the conditions for such availability set forth in the Eclipse
-Public License, v. 2.0 are satisfied: GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or (at your
-option) any later version, with the GNU Classpath Exception which is available
-at https://www.gnu.org/software/classpath/license.html.
+Distributed under the Eclipse Public License either version 1.0 or (at
+your option) any later version.
