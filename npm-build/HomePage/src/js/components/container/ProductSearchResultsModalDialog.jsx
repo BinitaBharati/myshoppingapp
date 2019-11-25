@@ -40,10 +40,12 @@ class ProductSearchResultsModalDialog extends Component {
   }
   
   componentDidMount(){
+	//Hack to open the bootstrap4 modal without clicking a button.
 	document.body.className  = 'modal-open';
   }
 
  componentWillUnmount(){
+	//Hack to close the bootstrap4 modal.
 	document.body.className = document.body.className.replace("modal-open","");
  } 
   
@@ -70,7 +72,7 @@ class ProductSearchResultsModalDialog extends Component {
 			   this.state.searchResults.data.searchResult.map(function (eachProductInfo){
 			   //alert('searchResultAjaxResponseJson: entered with eachProductInfo = '+JSON.stringify(eachProductInfo));
 			   //alert('hurr: '+this.state.rankMap[eachProductInfo.rank]);
-			   return (<div class="col-lg-4 col-md-6 mb-4">
+			   return (<div class="col-lg-6 col-md-8 mb-6">
                            <div class="card h-100">
 			                     <div class="card-body">
                                       <a href="#">
